@@ -17,18 +17,35 @@ while True:
     if inp=="exit":
         break
     elif spc[0]=="download":
-        f = open(spc[2],'a+')
+        # if spc[1]=="UDP":
+        #     f = open(spc[2],'w+')
+        #     print " downloading"
+        #
+        #     while True:
+        #         data = s.recv(1024)
+        #         temp=data.split("\n")
+        #         last=len(temp)
+        #         if temp[last-1]=="anuj":
+        #             print "Download succesfull"
+        #             break
+        #         f.write(data)
+        #     f.close()
+        f = open(spc[2],'w')
         print " downloading"
         while True:
             data = s.recv(1024)
             # print('data=%s\n', (data))
+            print data
+            print "recieved one chunk!!!!!!!!!!!!!!!!!!!!!"
             temp=data.split("\n")
             # print temp
             last=len(temp)
             if temp[last-1]=="anuj":
+                lent=len(data)
+                data[lent-4]="\0"
+                f.write(data)
                 print "Download succesfull"
                 break
-            f.write(data)
         f.close()
     else:
         data=s.recv(1024)
