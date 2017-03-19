@@ -52,7 +52,9 @@ def downfun(filename,query):
             conn.send(str(hashval))
             l=f.read(1024)
         time.sleep(0.1)
-        conn.send("\0")
+        conn.send("f&d")
+        time.sleep(0.1)
+        conn.send("haha")
         f.close()
         return
 def indfun(comm):

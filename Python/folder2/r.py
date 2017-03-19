@@ -66,19 +66,19 @@ while True:
                 print "hashval=",hashval
                 print "hashrec=",hashrec
                 if str(hashval) == str(hashrec):
-                    print "sahi he"
+                    print "correct chunk"
                 else:
-                    print "not okay"
+                    print "incorrect chunk"
 
 
                 if len(data)==1:
 
                     f.close()
                     break
-                if  data[last-1] == '' or data[last-1]=="\n":
+                if  data[last-1] == '' or data=="f&d" :
                     print 'EOF'
                     # tm = s.recv(1024)
-                    f.write(data)
+                    # f.write(data)
                     f.close()
                     break
                 f.write(data)

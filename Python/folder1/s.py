@@ -52,7 +52,9 @@ def downfun(filename,query):
             conn.send(str(hashval))
             l=f.read(1024)
         time.sleep(0.1)
-        conn.send("\0")
+        conn.send("f&d")
+        time.sleep(0.1)
+        conn.send("haha")
         f.close()
         return
 def indfun(comm):
@@ -60,10 +62,16 @@ def indfun(comm):
     if comm[1]=="longlist":
         ret=os.listdir(os.curdir)
         retfin = ''
+        temp = os.popen('ls -l').read()
+        # print temp
+        lines=temp.split("\n")
+        count=1
         for i in ret:
-            stat=os.stat(i)
-            retfin += i + ' ' + str  (stat.st_mtime) + ' ' + str(stat.st_size) + '\n'
+            col=lines[count].split()
 
+            stat=os.stat(i)
+            retfin += i + ' ' + str (col[5]) + ' '+ str (col[6]) + ' '+ str (col[7]) + ' ' + str(stat.st_size) + '\n'
+            count+=1
         conn.send(retfin)
 
     elif comm[1]=="regex":
@@ -90,17 +98,22 @@ def indfun(comm):
             status=0
             return
         ret=os.listdir(os.curdir)
+        temp = os.popen('ls -l').read()
+        lines = temp.split("\n")
+
         retfin = ''
+        count=1
         for i in ret:
             stat=os.stat(i)
+            col=lines[count].split()
             print comm[2],comm[3], stat.st_mtime
             t1 = int(comm[2])<int(stat.st_mtime)
             t2 = int(comm[3])>int(stat.st_mtime)
-            print t1,t2
+            # print t1,t2
             if int(stat.st_mtime)>=int(comm[2]) and int(stat.st_mtime)<=int(comm[3]):
-                retfin += i + ' ' + str(stat.st_mtime) + ' ' + str(stat.st_size) + '\n'
-        print retfin
-        print "here"
+                retfin += i + ' ' + str(col[5]) +' '+ str(col[6]) +' '+ str(col[7]) +' ' + str(stat.st_size) + '\n'
+        # print retfin
+        # print "here"
         if retfin == '':
             conn.send('No files')
         else:
