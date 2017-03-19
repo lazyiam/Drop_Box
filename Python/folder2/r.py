@@ -17,56 +17,72 @@ while True:
     if inp=="exit":
         break
     elif spc[0]=="download":
-        # if spc[1]=="UDP":
-        #     f = open(spc[2],'w+')
-        #     print " downloading"
-        #
-        #     while True:
-        #         data = s.recv(1024)
-        #         temp=data.split("\n")
-        #         last=len(temp)
-        #         if temp[last-1]=="anuj":
-        #             print "Download succesfull"
-        #             break
-        #         f.write(data)
-        #     f.close()
-        f = open(spc[2],'wb+')
-        print " downloading"
-        while True:
-            data = s.recv(1024)
-            # print('data=%s\n', (data))
-            # print data
-            # print "recieved one chunk!!!!!!!!!!!!!!!!!!!!!"
-            # temp=data.split("\n")
-            # print temp
+        if spc[1]=="UDP":
+            f = open(spc[2],'wb+')
+            print " downloading"
+            while True:
+                data = s.recv(1024)
 
-            last=len(data)
+                last=len(data)
 
-            if data[last-1]=="\0":
-                f.write(data[:-1])
-                f.close()
+                if data[last-1]=="\0":
+                    f.write(data[:-1])
+                    f.close()
 
-                f = open(spc[2],'rb')
-                md5 = hashlib.md5()
-                while True:
-                    data = f.read(1024)
-                    if not data:
-                        break
-                    md5.update(data)
-                f.close()
-                # # print("MD5: {0}".format(md5.hexdigest()))
-                hashval = format(md5.hexdigest())
-                # print "hashval=",hashval
-                hashrec=s.recv(1024)
-                print "hasrec=",hashrec
-                if str(hashrec)==str(hashval):
-                    print "Download succesfull"
+                    f = open(spc[2],'rb')
+                    md5 = hashlib.md5()
+                    while True:
+                        data = f.read(1024)
+                        if not   data:
+                            break
+                        md5.update(data)
+                    f.close()
+                    # # print("MD5: {0}".format(md5.hexdigest()))
+                    hashval = format(md5.hexdigest())
+                    # print "hashval=",hashval
+                    hashrec=s.recv(1024)
+                    print "hasrec=",hashrec
+                    if str(hashrec)==str(hashval):
+                        print "Download succesfull"
+                    else:
+                        print "nahi hua"
+                    f.close()
+                    break
                 else:
-                    print "nahi hua"
-                f.close()
-                break
-            else:
+                    f.write(data)
+        # else
+        else:
+            f = open(spc[2],'wb+')
+            print " downloading"
+            while True:
+                print 'In true'
+                data = s.recv(1024)
+                print 'recieved'
+                print data
+                last=len(data)
+                hashrec = s.recv(1024)
+                hashval = str(hashlib.md5(data).hexdigest())
+
+                print "hashval=",hashval
+                print "hashrec=",hashrec
+                if str(hashval) == str(hashrec):
+                    print "sahi he"
+                else:
+                    print "not okay"
+
+
+                if len(data)==1:
+
+                    f.close()
+                    break
+                if  data[last-1] == '' or data[last-1]=="\n":
+                    print 'EOF'
+                    # tm = s.recv(1024)
+                    f.write(data)
+                    f.close()
+                    break
                 f.write(data)
+
 
         # f.close()
     else:

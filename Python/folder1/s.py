@@ -17,31 +17,44 @@ s.listen(15)
 print 'Server listening....'
 
 conn, addr = s.accept()
-def downfun(filename):
-    f = open(filename,'rb')
-    l = f.read(1024)
-    while (l):
-        print l
-        conn.send(l)
+def downfun(filename,query):
+    if query=="UDP":
+        f = open(filename,'rb')
         l = f.read(1024)
-    conn.send("\0")
-    f.close()
-    time.sleep(0.1)
-    # conn.send("chutye")
-    f=open(comm[2],'rb')
-    md5=hashlib.md5()
-    while True:
-        data = f.read(1024)
-        if not data:
-            break
-        md5.update(data)
-    f.close()
-    # print("MD5: {0}".format(md5.hexdigest()))
-    hashval = format(md5.hexdigest())
-    f.close()
-    print "sending hash"
-    conn.send(str(hashval))
-    return
+        while (l):
+            print l
+            conn.send(l)
+            l = f.read(1024)
+        conn.send("\0")
+        f.close()
+        time.sleep(0.1)
+        f=open(comm[2],'rb')
+        md5=hashlib.md5()
+        while True:
+            data = f.read(1024)
+            if not data:
+                break
+            md5.update(data)
+        f.close()
+        hashval = format(md5.hexdigest())
+        f.close()
+        print "sending hash"
+        conn.send(str(hashval))
+        return
+    else:
+        f = open(filename,'rb')
+        l = f.read(1024)
+        while(l):
+            time.sleep(0.1)
+            conn.send(l)
+            hashval=hashlib.md5(l).hexdigest()
+            time.sleep(0.1)
+            conn.send(str(hashval))
+            l=f.read(1024)
+        time.sleep(0.1)
+        conn.send("\0")
+        f.close()
+        return
 def indfun(comm):
     status=1
     if comm[1]=="longlist":
@@ -148,6 +161,9 @@ while True:
     if data=="exit":
         break
     comm = data.split()
+    if len(comm)==0:
+        conn.send("wrong args")
+        continue
     if comm[0]=="index":
         status=indfun(comm)
         if status==0:
@@ -156,7 +172,7 @@ while True:
     elif comm[0]=="hash":
         hashfun(comm)
     elif comm[0]=="download":
-        downfun(comm[2])
+        downfun(comm[2],comm[1])
     elif comm[0]=="check_files":
         conn.send("recieved")
 
