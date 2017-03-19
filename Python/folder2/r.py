@@ -55,15 +55,15 @@ while True:
                     md5.update(data)
                 f.close()
                 # # print("MD5: {0}".format(md5.hexdigest()))
-                # hashval = format(md5.hexdigest())
+                hashval = format(md5.hexdigest())
                 # print "hashval=",hashval
                 hashrec=s.recv(1024)
                 print "hasrec=",hashrec
-                # if str(hashrec)==str(hashval):
-                #     print "Download succesfull"
-                # else:
-                #     print "nahi hua"
-                # f.close()
+                if str(hashrec)==str(hashval):
+                    print "Download succesfull"
+                else:
+                    print "nahi hua"
+                f.close()
                 break
             else:
                 f.write(data)

@@ -2,6 +2,7 @@ import socket
 import os
 import re
 import hashlib
+import time
 
 
 port = 60000
@@ -25,20 +26,21 @@ def downfun(filename):
         l = f.read(1024)
     conn.send("\0")
     f.close()
+    time.sleep(0.1)
     # conn.send("chutye")
-    # f=open(comm[2],'rb')
-    # md5=hashlib.md5()
-    # while True:
-    #     data = f.read(1024)
-    #     if not data:
-    #         break
-    #     md5.update(data)
-    # f.close()
-    # # print("MD5: {0}".format(md5.hexdigest()))
-    # hashval = format(md5.hexdigest())
-    # f.close()
-    # print "sending hash"
-    # conn.send(str(hashval))
+    f=open(comm[2],'rb')
+    md5=hashlib.md5()
+    while True:
+        data = f.read(1024)
+        if not data:
+            break
+        md5.update(data)
+    f.close()
+    # print("MD5: {0}".format(md5.hexdigest()))
+    hashval = format(md5.hexdigest())
+    f.close()
+    print "sending hash"
+    conn.send(str(hashval))
     return
 def indfun(comm):
     status=1
