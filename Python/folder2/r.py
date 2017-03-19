@@ -1,5 +1,5 @@
 import socket
-
+import hashlib
 s = socket.socket()
 s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 host = ""
@@ -9,7 +9,7 @@ s.connect((host, port))
 # while 1:
 #     s.send("Hello server!")
 # f = open('received_file', 'a+')
-print 'file opened'
+# print 'file opened'
 while True:
     inp=raw_input("prompt>>")
     s.send(inp)
@@ -37,19 +37,38 @@ while True:
             # print('data=%s\n', (data))
             # print data
             # print "recieved one chunk!!!!!!!!!!!!!!!!!!!!!"
-            temp=data.split("\n")
+            # temp=data.split("\n")
             # print temp
 
             last=len(data)
-            f.write(data)
-            if data[last-1]=="\0":
-                f.close()
-                # lent=len(data)
-                # data[lent-4]="\0"
-                print "Download succesfull"
-                break
 
-        f.close()
+            if data[last-1]=="\0":
+                f.write(data[:-1])
+                f.close()
+
+                f = open(spc[2],'rb')
+                md5 = hashlib.md5()
+                while True:
+                    data = f.read(1024)
+                    if not data:
+                        break
+                    md5.update(data)
+                f.close()
+                # # print("MD5: {0}".format(md5.hexdigest()))
+                # hashval = format(md5.hexdigest())
+                # print "hashval=",hashval
+                hashrec=s.recv(1024)
+                print "hasrec=",hashrec
+                # if str(hashrec)==str(hashval):
+                #     print "Download succesfull"
+                # else:
+                #     print "nahi hua"
+                # f.close()
+                break
+            else:
+                f.write(data)
+
+        # f.close()
     else:
         data=s.recv(1024)
         if not data:

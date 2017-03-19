@@ -12,7 +12,7 @@ host = ""
 s.bind((host, port))
 s.listen(15)
 
-filename = raw_input("Enter file to share:")
+# filename = raw_input("Enter file to share:")
 print 'Server listening....'
 
 conn, addr = s.accept()
@@ -23,8 +23,9 @@ def downfun(filename):
         print l
         conn.send(l)
         l = f.read(1024)
-    conn.send('\0')
+    conn.send("\0")
     f.close()
+    # conn.send("chutye")
     # f=open(comm[2],'rb')
     # md5=hashlib.md5()
     # while True:
@@ -36,6 +37,7 @@ def downfun(filename):
     # # print("MD5: {0}".format(md5.hexdigest()))
     # hashval = format(md5.hexdigest())
     # f.close()
+    # print "sending hash"
     # conn.send(str(hashval))
     return
 def indfun(comm):
