@@ -30,22 +30,25 @@ while True:
         #             break
         #         f.write(data)
         #     f.close()
-        f = open(spc[2],'w')
+        f = open(spc[2],'wb+')
         print " downloading"
         while True:
             data = s.recv(1024)
             # print('data=%s\n', (data))
-            print data
-            print "recieved one chunk!!!!!!!!!!!!!!!!!!!!!"
+            # print data
+            # print "recieved one chunk!!!!!!!!!!!!!!!!!!!!!"
             temp=data.split("\n")
             # print temp
-            last=len(temp)
-            if temp[last-1]=="anuj":
-                lent=len(data)
-                data[lent-4]="\0"
-                f.write(data)
+
+            last=len(data)
+            f.write(data)
+            if data[last-1]=="\0":
+                f.close()
+                # lent=len(data)
+                # data[lent-4]="\0"
                 print "Download succesfull"
                 break
+
         f.close()
     else:
         data=s.recv(1024)
