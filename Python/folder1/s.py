@@ -87,7 +87,7 @@ def indfun(comm):
             # print i
             print out
             if str(out)!="None":
-                retfin+= str(i)
+                retfin+= str(i) + "\n"
         if retfin=='':
             conn.send("No Match Found")
         else:
@@ -168,10 +168,21 @@ def hashfun(comm):
         else:
             conn.send(retfin)
     return
+def syncfun(filename):
+    md5 = hashlib.md5()
+    f = open(filename,'rb')
+    while True:
+        data = f.read(1024)
+        if not data:
+            break
+        md5.update(data)
+    f.close()
+    hashval = format(md5.hexdigest())
+    conn.send(str(hashval))
 while True:
     print "yahan"
     data = conn.recv(1024)
-    if data=="exit":
+    if data=="exit" or (not data):
         break
     comm = data.split()
     if len(comm)==0:
@@ -187,7 +198,15 @@ while True:
     elif comm[0]=="download":
         downfun(comm[2],comm[1])
     elif comm[0]=="check_files":
-        conn.send("recieved")
+        # while True:
+        time.sleep(0.1)
+        inp=conn.recv(1024)
+        if inp=="Done":
+            print "here"
+            break
+        else:
+            syncfun(inp)
+        # conn.send("recieved")
 
 
 
