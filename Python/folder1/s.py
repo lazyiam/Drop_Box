@@ -6,8 +6,10 @@ import time
 
 
 port = 60000
-s = socket.socket()
+port2=40000
+s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+sock2=socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
 host = ""
 
 s.bind((host, port))
@@ -23,9 +25,9 @@ def downfun(filename,query):
         l = f.read(1024)
         while (l):
             print l
-            conn.send(l)
+            sock2.sendto(l,(host,port2))
             l = f.read(1024)
-        conn.send("\0")
+        sock2.sendto("\0",(host,port2))
         f.close()
         time.sleep(0.1)
         f=open(comm[2],'rb')
@@ -39,7 +41,7 @@ def downfun(filename,query):
         hashval = format(md5.hexdigest())
         f.close()
         print "sending hash"
-        conn.send(str(hashval))
+        sock2.sendto(str(hashval),(host,port2))
         return
     else:
         f = open(filename,'rb')
@@ -50,6 +52,15 @@ def downfun(filename,query):
             hashval=hashlib.md5(l).hexdigest()
             time.sleep(0.1)
             conn.send(str(hashval))
+            while True:
+                x = conn.recv(1024)
+                if x=="correct":
+                    break
+                else:
+                    time.sleep(0.1)
+                    conn.send(l)
+                    time.sleep(0.1)
+                    conn.send(str(hashval))
             l=f.read(1024)
         time.sleep(0.1)
         conn.send("f&d")

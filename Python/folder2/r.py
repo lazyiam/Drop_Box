@@ -2,11 +2,14 @@ import socket
 import hashlib
 import time
 import os
-s = socket.socket()
+s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+sock2=socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
 host = ""
+sock2.bind((host, 40000))
 port = 60000
-#anu
+port2 = 40000
+#an
 s.connect((host, port))
 # while 1:
 #     s.send("Hello server!")
@@ -18,7 +21,7 @@ def downfil(filename,typeq):
         f = open(filename,'wb+')
         print "downloading"
         while True:
-            data = s.recv(1024)
+            data, adr = sock2.recvfrom(1024)
 
             last=len(data)
 
@@ -37,10 +40,10 @@ def downfil(filename,typeq):
                 # # print("MD5: {0}".format(md5.hexdigest()))
                 hashval = format(md5.hexdigest())
                 # print "hashval=",hashval
-                hashrec=s.recv(1024)
+                hashrec, adr =sock2.recvfrom(1024)
                 print "hasrec=",hashrec
                 if str(hashrec)==str(hashval):
-                    print "Download succesfull"
+                    print "Download successfull"
                 else:
                     print "nahi hua"
                 f.close()
@@ -52,7 +55,7 @@ def downfil(filename,typeq):
         f = open(filename,'wb+')
         print " downloading"
         while True:
-            print 'In true'
+            # print 'In true'
             data = s.recv(1024)
             print 'recieved'
             print data
@@ -63,9 +66,22 @@ def downfil(filename,typeq):
             print "hashval=",hashval
             print "hashrec=",hashrec
             if str(hashval) == str(hashrec):
+                # time.sleep(0.1)
+                s.send("correct")
                 print "correct chunk"
+                # time.sleep(0.1)
+
             else:
-                print "incorrect chunk"
+                # time.sleep(0.1)
+                if hashrec!="haha":
+                    s.send("error")
+                    print "incorrect chunk"
+                # time.sleep(0.1)
+                    continue
+                else:
+                    s.send("correct")
+                    print "correct chunk"
+
 
 
             if len(data)==1:
@@ -94,6 +110,7 @@ def hashfun(filename):
 flag=0
 while True:
     if time.time()-last_update>3 :
+        print "checking files"
         files = os.listdir(os.curdir)
         for m in files:
             i=str(m)
