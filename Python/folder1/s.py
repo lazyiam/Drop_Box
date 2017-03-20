@@ -168,6 +168,7 @@ def hashfun(comm):
         else:
             conn.send(retfin)
     return
+#change
 def syncfun(filename):
     md5 = hashlib.md5()
     f = open(filename,'rb')
@@ -175,14 +176,20 @@ def syncfun(filename):
         data = f.read(1024)
         if not data:
             break
+            #hah
         md5.update(data)
     f.close()
     hashval = format(md5.hexdigest())
     conn.send(str(hashval))
+    time.sleep(0.1)
+    stat=os.stat(filename)
+    temp=int(stat.st_mtime)
+    conn.send(str(temp))
+    return
 while True:
     print "yahan"
     data = conn.recv(1024)
-    if data=="exit" or (not data):
+    if data=="exit":
         break
     comm = data.split()
     if len(comm)==0:

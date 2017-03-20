@@ -6,12 +6,12 @@ s = socket.socket()
 s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 host = ""
 port = 60000
-
+#anu
 s.connect((host, port))
 # while 1:
 #     s.send("Hello server!")
 # f = open('received_file', 'a+')
-# print 'file opened'
+# print 'file open'
 last_update=time.time()
 def downfil(filename,typeq):
     if typeq=="UDP":
@@ -103,7 +103,11 @@ while True:
             s.send(i)
             hashrec=s.recv(1024)
             hashi=hashfun(i)
-            if hashi!=hashrec:
+            stat=os.stat(i)
+            recmtime=s.recv(1024)
+    	    # print "recmtime=",recmtime
+            # print "myfile=",int(stat.st_mtime)
+            if hashi!=hashrec and (int(stat.st_mtime) < int(recmtime)):
                 time.sleep(0.1)
                 print "upadated:",i
                 se="download UDP"+" "+str(i)
