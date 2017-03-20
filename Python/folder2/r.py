@@ -118,20 +118,26 @@ while True:
         # s.recv()
     else:
         inp = raw_input("prompt>>")
-        s.send(inp)
-        spc=inp.split()
-        if inp=="exit":
-            break
-        elif spc[0]=="download":
-            downfil(spc[2],spc[1])
-        # flag=0
-
-            # f.close()
+        if not inp :
+            print "Enter Command"
         else:
-            data=s.recv(1024)
-            if not data:
-                continue
-            print data
+            spc=inp.split()
+            if spc[0]=="download"  or spc[0]=="index" or spc[0]=="hash" or inp=="exit":
+                s.send(inp)
+                if inp=="exit":
+                    break
+                elif spc[0]=="download":
+                    downfil(spc[2],spc[1])
+                # flag=0
+
+                    # f.close()
+                else:
+                    data=s.recv(1024)
+                    if not data:
+                        continue
+                    print data
+            else:
+                print "wrong command"
 
 
 # f.close()

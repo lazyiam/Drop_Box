@@ -182,7 +182,7 @@ def syncfun(filename):
 while True:
     print "yahan"
     data = conn.recv(1024)
-    if data=="exit":
+    if data=="exit" or (not data):
         break
     comm = data.split()
     if len(comm)==0:
