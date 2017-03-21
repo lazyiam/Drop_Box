@@ -10,8 +10,8 @@ class Serverth(Thread):
         Thread.__init__(self)
         # self.val = val
     def run(self):
-        port = 60000
-        port2=40000
+        port = 20000
+        port2=30000
         s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
         s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         sock2=socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
@@ -35,7 +35,7 @@ class Serverth(Thread):
                 sock2.sendto("\0",(host,port2))
                 f.close()
                 time.sleep(0.1)
-                f=open(comm[2],'rb')
+                f=open(filename,'rb')
                 md5=hashlib.md5()
                 while True:
                     data = f.read(1024)
@@ -185,7 +185,7 @@ class Serverth(Thread):
                     conn.send(retfin)
             return
         #change
-        def syncfun(filename):
+        def findhash(filename):
             md5 = hashlib.md5()
             f = open(filename,'rb')
             while True:
@@ -196,12 +196,40 @@ class Serverth(Thread):
                 md5.update(data)
             f.close()
             hashval = format(md5.hexdigest())
-            conn.send(str(hashval))
-            time.sleep(0.1)
-            stat=os.stat(filename)
-            temp=int(stat.st_mtime)
-            conn.send(str(temp))
+            return hashval
+        def syncfun():
+            # md5 = hashlib.md5()
+            # f = open(filename,'rb')
+            ls = os.listdir(os.curdir)
+            for i in ls:
+                filehash = findhash(i)
+                stat = os.stat(i)
+                tempstr = i + " " + filehash + " " + str(stat.st_mtime)
+                # time.sleep(0.1)
+                conn.send(tempstr)
+                se=conn.recv(1024)
+                if se == "download":
+                    downfun(i,"UDP")
+            conn.send("done")
             return
+
+
+
+
+            # while True:
+            #     data = f.read(1024)
+            #     if not data:
+            #         break
+            #         #hah
+            #     md5.update(data)
+            # f.close()
+            # hashval = format(md5.hexdigest())
+            # conn.send(str(hashval))
+            # time.sleep(0.1)
+            # stat=os.stat(filename)
+            # temp=int(stat.st_mtime)
+            # conn.send(str(temp))
+            # return
         while True:
             print "yahan"
             data = conn.recv(1024)
@@ -223,12 +251,12 @@ class Serverth(Thread):
             elif comm[0]=="check_files":
                 # while True:
                 time.sleep(0.1)
-                inp=conn.recv(1024)
-                if inp=="Done":
-                    print "here"
-                    break
-                else:
-                    syncfun(inp)
+                syncfun()
+                # inp=conn.recv(1024)
+                # if inp=="Done":
+                #     print "here"
+                #     break
+                # else:
                 # conn.send("recieved")
 
 
@@ -238,6 +266,7 @@ class Serverth(Thread):
         conn.send('Thank you for connecting')
         conn.close()
         s.close()
+
 class Recth(Thread):
     def __init__(self):
         Thread.__init__(self)
@@ -247,7 +276,7 @@ class Recth(Thread):
         s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         sock2=socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
         host = ""
-        port = 45000
+        port = 40000
         port2 = 50000
         sock2.bind((host, port2))
         #an
@@ -351,32 +380,34 @@ class Recth(Thread):
         flag=0
         while True:
             if time.time()-last_update>3 :
+                last_update=time.time()
+                s.send("check_files")
                 print "checking files"
                 files = os.listdir(os.curdir)
-                for m in files:
-                    i=str(m)
-                    time.sleep(0.1)
-                    s.send("check_files")
-                    time.sleep(0.1)
-                    s.send(i)
-                    hashrec=s.recv(1024)
-                    hashi=hashfun(i)
-                    stat=os.stat(i)
-                    recmtime=s.recv(1024)
-            	    # print "recmtime=",recmtime
-                    # print "myfile=",int(stat.st_mtime)
-                    if hashi!=hashrec and (int(stat.st_mtime) < int(recmtime)):
-                        time.sleep(0.1)
-                        print "upadated:",i
-                        se="download UDP"+" "+str(i)
-                        s.send(se)
-                        downfil(i,"UDP")
-                        time.sleep(0.1)
-                # s.send("check_files")
-                # time.sleep(0.1)
-                # s.send("Done")
-                last_update=time.time()
-
+                while True:
+                    tempstr = s.recv(1024)
+                    if tempstr=="done":
+                        break
+                    else:
+                        sptstr = tempstr.split()
+                        flagpre=0
+                        for i in files:
+                            if i==sptstr[0]:
+                                flagpre=1
+                                stat = os.stat(i)
+                                if sptstr[1]!=hashfun(i) and sptstr[2] > str(stat.st_mtime):
+                                    # time.sleep(0.1)
+                                    # se="download UDP"+" "+str(i)
+                                    se = "download"
+                                    s.send(se)
+                                    downfil(i,"UDP")
+                                else:
+                                    time.sleep(0.1)
+                                    s.send("okay")
+                        if flagpre==0:
+                            time.sleep(0.1)
+                            s.send("download")
+                            downfil(sptstr[0],"UDP")
                 # s.recv()
             else:
                 inp = raw_input("prompt>>")
