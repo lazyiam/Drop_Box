@@ -47,7 +47,7 @@ class Serverth(Thread):
                 mode = oct(stat.S_IMODE(os.stat(filename).st_mode))
                 hashval = str(format(md5.hexdigest())) + " " + str(mode)
                 f.close()
-                print "sending hash"
+                # print "sending hash"
                 sock2.sendto(str(hashval),(host,port2))
                 return
             else:
@@ -103,7 +103,7 @@ class Serverth(Thread):
                     out = re.search(str(comm[2]),i)
                     # stat=os.stat(i)
                     # print i
-                    print out
+                    # print out
                     if str(out)!="None":
                         retfin+= str(i) + "\n"
                 if retfin=='':
@@ -124,7 +124,7 @@ class Serverth(Thread):
                 for i in ret:
                     stat=os.stat(i)
                     col=lines[count].split()
-                    print comm[2],comm[3], stat.st_mtime
+                    # print comm[2],comm[3], stat.st_mtime
                     t1 = int(comm[2])<int(stat.st_mtime)
                     t2 = int(comm[3])>int(stat.st_mtime)
                     # print t1,t2
@@ -218,22 +218,8 @@ class Serverth(Thread):
 
 
 
-            # while True:
-            #     data = f.read(1024)
-            #     if not data:
-            #         break
-            #         #hah
-            #     md5.update(data)
-            # f.close()
-            # hashval = format(md5.hexdigest())
-            # conn.send(str(hashval))
-            # time.sleep(0.1)
-            # stat=os.stat(filename)
-            # temp=int(stat.st_mtime)
-            # conn.send(str(temp))
-            # return
         while True:
-            print "yahan"
+            # print "yahan"
             data = conn.recv(1024)
             if data=="exit":
                 break
@@ -243,8 +229,8 @@ class Serverth(Thread):
                 continue
             if comm[0]=="index":
                 status=indfun(comm)
-                if status==0:
-                    continue
+                # if status==0:
+                #     continue
 
             elif comm[0]=="hash":
                 hashfun(comm)
@@ -316,7 +302,7 @@ class Recth(Thread):
                         spt = hashtemp.split()
                         hashrec = spt[0]
                         fperm = int(spt[1],8)
-                        print "hasrec=",hashrec
+                        # print "hasrec=",hashrec
                         if str(hashrec)==str(hashval):
                             os.chmod(filename, fperm)
                             print "Download successfull"
@@ -333,14 +319,14 @@ class Recth(Thread):
                 while True:
                     # print 'In true'
                     data = s.recv(1024)
-                    print 'recieved'
-                    print data
+                    # print 'recieved'
+                    # print data
                     last=len(data)
                     hashrec = s.recv(1024)
                     hashval = str(hashlib.md5(data).hexdigest())
 
-                    print "hashval=",hashval
-                    print "hashrec=",hashrec
+                    # print "hashval=",hashval
+                    # print "hashrec=",hashrec
                     if str(hashval) == str(hashrec):
                         # time.sleep(0.1)
                         s.send("correct")
@@ -365,7 +351,7 @@ class Recth(Thread):
                         f.close()
                         break
                     if  data[last-1] == '' or data=="f&d" :
-                        print 'EOF'
+                        # print 'EOF'
                         # tm = s.recv(1024)
                         # f.write(data)
                         f.close()
@@ -406,6 +392,7 @@ class Recth(Thread):
                                     # se="download UDP"+" "+str(i)
                                     se = "download"
                                     s.send(se)
+                                    print "Downloading: ",sptstr[0]
                                     downfil(i,"UDP")
                                 else:
                                     time.sleep(0.1)
@@ -413,6 +400,7 @@ class Recth(Thread):
                         if flagpre==0:
                             time.sleep(0.1)
                             s.send("download")
+                            print "Downloading: ",sptstr[0]
                             downfil(sptstr[0],"UDP")
                 # s.recv()
             else:
