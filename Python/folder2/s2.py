@@ -3,6 +3,7 @@ import os
 import re
 import hashlib
 import time
+import stat
 from threading import Thread
 
 class Serverth(Thread):
@@ -10,8 +11,8 @@ class Serverth(Thread):
         Thread.__init__(self)
         # self.val = val
     def run(self):
-        port = 20000
-        port2=30000
+        port = 40000
+        port2=50000
         s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
         s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         sock2=socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
@@ -43,7 +44,8 @@ class Serverth(Thread):
                         break
                     md5.update(data)
                 f.close()
-                hashval = format(md5.hexdigest())
+                mode = oct(stat.S_IMODE(os.stat(filename).st_mode))
+                hashval = str(format(md5.hexdigest())) + " " + str(mode)
                 f.close()
                 print "sending hash"
                 sock2.sendto(str(hashval),(host,port2))
@@ -276,8 +278,8 @@ class Recth(Thread):
         s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         sock2=socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
         host = ""
-        port = 40000
-        port2 = 50000
+        port = 20000
+        port2 = 30000
         sock2.bind((host, port2))
         #an
         s.connect((host, port))
@@ -310,9 +312,13 @@ class Recth(Thread):
                         # # print("MD5: {0}".format(md5.hexdigest()))
                         hashval = format(md5.hexdigest())
                         # print "hashval=",hashval
-                        hashrec, adr =sock2.recvfrom(1024)
+                        hashtemp, adr =sock2.recvfrom(1024)
+                        spt = hashtemp.split()
+                        hashrec = spt[0]
+                        fperm = int(spt[1],8)
                         print "hasrec=",hashrec
                         if str(hashrec)==str(hashval):
+                            os.chmod(filename, fperm)
                             print "Download successfull"
                         else:
                             print "nahi hua"
